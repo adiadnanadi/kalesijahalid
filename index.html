@@ -202,6 +202,7 @@
         }
 
         // Slanje podataka na Google Sheet
+        // Slanje podataka na Google Sheet (Ispravljena verzija)
         async function sendDataToGoogleSheet(barcode, format = 'BARCODE') {
             showToast("Slanje...", "Podaci se spremaju u Google Sheet...", "loading");
             
@@ -213,28 +214,27 @@
             };
 
             try {
-                // Koristimo 'no-cors' mode jer Apps Script preusmjerava zahtjeve, 
-                // ali naša skripta na sheetu će svejedno spremiti podatak!
+                // Šaljemo kao text/plain kako bi se zaobišla CORS blokada Googlea
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
+                    cache: 'no-cache',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify(payload)
                 });
 
-                // Dodaj u lokalnu povijest
+                // Dodaj u lokalnu povijest i prikaži uspjeh
                 addToHistory(barcode, format);
                 showToast("Uspješno spremljeno!", `Kod: ${barcode}`, "success");
                 barcodeInput.value = barcode;
 
             } catch (error) {
                 console.error("Greška pri slanju:", error);
-                showToast("Greška pri slanju", "Provjerite internet i URL skripte.", "error");
+                showToast("Greška pri slanju", "Provjerite internet vezu.", "error");
             }
         }
-
         // Pokretanje i zaustavljanje skeniranja
         async function toggleScanner() {
             if (isScanning) {
